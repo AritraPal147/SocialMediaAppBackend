@@ -2,7 +2,8 @@ from typing import List
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app import models, schemas
+
+from app import models, schemas, utils
 from app.database import engine, get_db
 
 
@@ -25,19 +26,34 @@ async def get_posts(db: Session = Depends(get_db)):
 
 
 # Method for creating posts
+# Create a new post based on the data given in api call
+# **post.model_dump() converts the Pydantic model post into a dictionary and unpacks it
+# Then, add the new post to the db, commit (db.commit()) and fetch (db.refresh())
 @app.post(
     "/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse
 )
 async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
-    # Create a new post based on the data given in api call
-    # **post.model_dump() converts the Pydantic model post into a dictionary and unpacks it
     new_post = models.Post(**post.model_dump())
-    # Add the new post to the db and commit
     db.add(new_post)
     db.commit()
-    # Fetch the new post
     db.refresh(new_post)
+
     return new_post
+
+
+# Method for creating users
+@app.post(
+    "/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse
+)
+async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Update password to the hashed password
+    user.password = utils.hash(user.password)
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
 
 
 # Method to get specific post by id
