@@ -47,7 +47,7 @@ async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
 )
 async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Update password to the hashed password
-    user.password = utils.hash(user.password)
+    user.password = utils.hash_password(user.password)
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
