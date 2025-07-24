@@ -37,6 +37,7 @@ class UserCreate(UserBase):
 
 # Entity class for user response for APIs
 class UserResponse(UserBase):
+    id: int
     created_at: datetime
 
     class Config:
