@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from app.database import get_db
 
-router = APIRouter(prefix="/posts")
+# tags are used for grouping requests in the documentation
+router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
 # Method for getting all posts
